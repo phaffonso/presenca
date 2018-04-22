@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# coding=utf-8
 
 import sys
 import csv
@@ -22,7 +23,6 @@ def calcPresenca(lista):
         for hora in lista:
             if(time2f(hora) <= horaminsaida[horario]):
                 saida = max(horario, saida)
-    print (entrada, saida)
     return [entrada == 0 and saida >= 0, entrada <= 1 and saida >= 1, entrada <= 2 and saida == 2]
 
 def converteArq(in_fn, out_fn):
@@ -43,23 +43,34 @@ def converteArq(in_fn, out_fn):
                 pres[key].add(hora)
             else:
                 pres[key] = set([hora])
-        
+    
+    
     with open(out_fn, "w") as fout:
-        fout.write('"nome","presencas","presencas extra"\n');
-    #header
+        #escrever cabecalho
         nomes_ord = sorted(list(nomes))
-       
+        dias_ord = sorted(list(dias), key = lambda dia: dia.split('/')[::-1])  
+        fout.write('"nome"')
+        for dia in dias_ord:
+            fout.write(',"'+str(dia)+'"')
+        fout.write(',"presencas normais","presencas extra"\n');
+        
         for nome in nomes_ord:
             soma_extra = 0
             soma = 0
-            for dia in dias:
+            fout.write('"' + nome + '"')
+            for dia in dias_ord:
                 key = (dia, nome)
                 presenca = [False,False,False]
                 if(key in pres):
                     presenca = calcPresenca(pres[key])
+                fout.write(','+str(sum(presenca)))
                 soma = soma + sum(presenca[1:])
                 soma_extra = soma_extra + sum(presenca[0:1])
-            fout.write('"' + nome + '",' + str(soma) + ',' + str(soma_extra) + '\n')
+            fout.write(',' + str(soma) + ',' + str(soma_extra) + '\n')
+            
+        #escrever totais
+        #fout.write('"Totais/médias"')
+        #fout.write('\n')
             
 # if(len(sys.argv) != 3):
     # print 'Uso correto: python presenca.py arq_entrada.csv arq_saida.csv'
