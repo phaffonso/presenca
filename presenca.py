@@ -32,7 +32,11 @@ def leArq(in_fn, nomes, dias, pres):
         next(fin)#pula primeira linha
         for line in fin :
             fields = line.split(";")
-            data,hora,evento,codigo,nome,matricula,portal,null = fields
+            try:
+                data,hora,evento,codigo,nome,matricula,portal,null = fields
+            except ValueError as e:
+                print "Erro na linha: "+line
+                raise
             nomes.add(normalizaNome(nome))
             dias.add(data)
             key = (data, normalizaNome(nome))
@@ -105,14 +109,15 @@ def escreveArq(out_fn, nomes, dias, pres, alunos):
         #fout.write('\n')
 
 def normalizaNome(nome):
-    return re.sub("[^a-zA-Z0-9 ]", "", nome)[:23]
+    return re.sub("[^a-zA-Z0-9 ]", "", nome)[:23].upper()
+    
 
 
 def main():
     alunos = carregaAlunos("alunos.csv");
     dic_alunos = {};
     for aluno in alunos:
-        dic_alunos[normalizaNome(aluno.nome)] = aluno;
+        dic_alunos[normalizaNome(aluno.nome)] = aluno
     fn_in = next(os.walk('./in'))[2]
     nomes = set()
     dias = set()
