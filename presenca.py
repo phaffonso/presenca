@@ -72,26 +72,28 @@ def converteArq(in_fn, out_fn):
 
 def escreveArq(out_fn, nomes, dias, pres, alunos):       
     with codecs.open(out_fn, "w", encoding='utf8') as fout:
-        #escrever cabecalho
-        nomes_ord = sorted(list(nomes))
+        #encontrar perdidos - nomes não associados a alunos cadastrados
+        perdidos = [];
+        for nome in nomes:
+            if(not nome in alunos):
+                perdidos.append(nome);
+                
+        alunos_ord = sorted(list(alunos.values()), key=lambda a:(a.sala, a.nome))
         dias_ord = sorted(list(dias), key = lambda dia: dia.split('/')[::-1])  
+        #escrever cabecalho
         fout.write('"insrcicao", "nome","sala"')
         for dia in dias_ord:
             fout.write(',"'+str(dia)+'"')
         fout.write(',"presencas normais","presencas extra"\n');
         
-        perdidos = [];
-        for nome in nomes_ord:
+        for aluno in alunos_ord:
             soma_extra = 0
             soma = 0
-            if(nome in alunos):
-                aluno = alunos[nome]
-                fout.write(aluno.inscricao+',"' + aluno.nome + '","'+aluno.sala+'"')
-            else:
-                perdidos.append(nome);
-                continue;
+
+            fout.write(aluno.inscricao+',"' + aluno.nome + '","'+aluno.sala+'"')
+
             for dia in dias_ord:
-                key = (dia, normalizaNome(nome))
+                key = (dia, normalizaNome(aluno.nome))
                 presenca = [False,False,False]
                 if(key in pres):
                     presenca = calcPresenca(pres[key])
