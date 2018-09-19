@@ -23,7 +23,7 @@ def calcPresenca(lista):
                 entrada = min(horario, entrada)
     for horario in range(3):
         for hora in lista:
-            if(time2f(hora) <= horaminsaida[horario]):
+            if(time2f(hora) >= horaminsaida[horario]):
                 saida = max(horario, saida)
     return [entrada == 0 and saida >= 0, entrada <= 1 and saida >= 1, entrada <= 2 and saida == 2]
     
@@ -97,6 +97,11 @@ def escreveArq(out_fn, nomes, dias, pres, alunos):
                 presenca = [False,False,False]
                 if(key in pres):
                     presenca = calcPresenca(pres[key])
+                    if sum(presenca) == 0:                        
+                        if len(pres[key]) == 1:
+                            print "warn: aluno s/ hora saida "+dia+"\t"+(list(pres[key]))[0]+"\t"+aluno.nome+" "
+                        else:
+                            print "warn: aluno s/ presenca "+dia+"\t"+str(pres[key])+"\t"+aluno.nome+" "
                 fout.write(','+str(sum(presenca)))
                 soma = soma + sum(presenca[1:])
                 soma_extra = soma_extra + sum(presenca[0:1])
